@@ -1,0 +1,33 @@
+{
+  "name": "slack-db-quiz",
+  "version": "0.0.1",
+  "description": "Show IPA-DB quiz with message button on slack",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomoki1207/slack-db-quiz.git"
+  },
+  "author": "tomoki1207",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tomoki1207/ipa-db-bot.git"
+  },
+  "homepage": "https://github.com/tomoki1207/slack-db-quiz.git#readme",
+  "devDependencies": {
+    "eslint": "^3.3.1",
+    "eslint-plugin-node": "^2.0.0"
+  },
+  "dependencies": {
+    "@ponko2/botkit-heroku-keepalive": "^0.8.0",
+    "async": "^2.0.1",
+    "aws-sdk": "^2.5.3",
+    "botkit": "^0.2.2",
+    "botkit-storage-mongo": "^1.0.4",
+    "cheerio-httpcli": "^0.6.8",
+    "cron": "^1.1.0",
+    "request": "^2.74.0"
+  }
+}
