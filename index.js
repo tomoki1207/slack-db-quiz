@@ -1,7 +1,7 @@
 var Botkit = require('botkit');
 var HerokuKeepalive = require('@ponko2/botkit-heroku-keepalive');
 var cheerio = require('cheerio-httpcli');
-var mongoStorage = require('botkit-storage-mongo')({mongoUri: process.env.mongoUri});
+var mongoStorage = require('botkit-storage-mongo')({mongoUri: process.env.MONGODB_URI});
 var cronJob = require('cron').CronJob;
 
 if (!process.env.clientId || !process.env.clientSecret || !process.env.port) {
