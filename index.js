@@ -175,9 +175,9 @@ var generateQuiz = function (cb) {
       });
 
       var imageUrl = '';      
-      var m = link.match(/am2_(\d+).html/i);
+      var m = $('.qno + div').find('.img_margin');
       if (m) {
-        imageUrl = link.replace(m[0], 'img/' + (m[1].length === 2 ? '' : '0') + m[1] + '.gif');
+        imageUrl = link.replace(/am2_\d+\.html/i, m.find('img').attr('src'));
       }
       
       cb({
