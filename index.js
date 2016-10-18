@@ -142,7 +142,7 @@ controller.on('interactive_message_callback', function (bot, message) {
       'attachments': [{
         'text': text,
         'fallback': '失敗しました。',
-        'callback_id': 'nw_answer',
+        'callback_id': 'db_answer',
         'color': collect ? 'good' : 'danger'
       }],
       'response_type': 'in_channel',
@@ -163,34 +163,64 @@ var generateQuiz = function (cb) {
       var no = $('.qno').text();
       var q = $('.qno + div').text() + '\n\n';
       var anss = [];
+      var choiseByImg = false;
       $('.selectBtn').each(function () {
         var btn = $(this);
-        var txt = btn.prev('div');
-        q += btn.text() + (txt ? ('.  ' + txt.text()) : '') + '\n';
-        anss.push({
+        var ans = {
           'type': 'button',
           'name': btn.attr('id') ? 'collect' : 'wrong',
-          'text': btn.find('button').text()
+          'text': btn.find('button').text(),
+        };
+
+        var img = btn.prev('div').find('img');         
+        if (!img.length) {
+          q += btn.text() + '.  ' + btn.prev('div').text() + '\n';
+          anss.push(ans);
+        } else {
+          choiseByImg = true;
+          // as other attachment
+          var att = {
+            'text': btn.find('button').text(),
+            'image_url': link.replace(/am2_\d+\.html/i, img.attr('src')),
+            'color': '#808080',
+            'callback_id': 'db_answer',
+            'actions': [ans]
+          };
+          anss.push(att);
+        }
+      });
+      
+      var attachments = [];
+      attachments.push({
+        'title': q,
+        'text': '\n\n詳細や画像が表示されていない場合はこちらへ\n' + link,
+        'fallback': '失敗しました。',
+        'callback_id': 'db_answer',
+        'color': 'good'
+      });
+      
+      // show images    
+      $('.qno + div').find('.img_margin').each(function () {
+        var d = $(this);
+        attachments.push({
+          'text': no,
+          'color': '#808080',
+          'image_url': link.replace(/am2_\d+\.html/i, d.find('img').attr('src'))
         });
       });
-
-      var imageUrl = '';      
-      var m = $('.qno + div').find('.img_margin');
-      if (m) {
-        imageUrl = link.replace(/am2_\d+\.html/i, m.find('img').attr('src'));
-      }
       
+      // answers
+      if (choiseByImg) {
+        attachments = attachments.concat(anss);
+      } else {
+        var a = attachments[0];
+        a.actions = anss;
+        attachments[0] = a;
+      }
+
       cb({
         'text': no,
-        'attachments': [{
-          'title': q,
-          'text': '\n\n詳細や画像が表示されていない場合はこちらへ\n' + link,
-          'fallback': '失敗しました。',
-          'callback_id': 'db_answer',
-          'color': '#808080',
-          'image_url': imageUrl,
-          'actions': anss
-        }]
+        'attachments': attachments
       });
     });
   });
