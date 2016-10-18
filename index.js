@@ -174,6 +174,12 @@ var generateQuiz = function (cb) {
         });
       });
 
+      var imageUrl = '';      
+      var m = link.match(/am2_(\d+).html/i);
+      if (m) {
+        imageUrl = link.replace(m[0], 'img/' + (m[1].length === 2 ? '' : '0') + m[1] + '.gif');
+      }
+      
       cb({
         'text': no,
         'attachments': [{
@@ -182,6 +188,7 @@ var generateQuiz = function (cb) {
           'fallback': '失敗しました。',
           'callback_id': 'db_answer',
           'color': '#808080',
+          'image_url': imageUrl,
           'actions': anss
         }]
       });
