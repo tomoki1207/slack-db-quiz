@@ -141,7 +141,7 @@ controller.on('interactive_message_callback', function (bot, message) {
       'text': original.text,
       'attachments': [{
         'text': text,
-        'fallback': '失敗しました。',
+        'fallback': message.actions[0].text + ' を選択 ->' + (collect ? '正解' : '残念'),
         'callback_id': 'db_answer',
         'color': collect ? 'good' : 'danger'
       }],
@@ -179,9 +179,11 @@ var generateQuiz = function (cb) {
         } else {
           choiseByImg = true;
           // as other attachment
+          var url = link.replace(/am2_\d+\.html/i, img.attr('src'));
           var att = {
             'text': btn.find('button').text(),
-            'image_url': link.replace(/am2_\d+\.html/i, img.attr('src')),
+            'fallback': url,
+            'image_url': url,
             'color': '#808080',
             'callback_id': 'db_answer',
             'actions': [ans]
@@ -194,7 +196,7 @@ var generateQuiz = function (cb) {
       attachments.push({
         'title': q,
         'text': '\n\n詳細や画像が表示されていない場合はこちらへ\n' + link,
-        'fallback': '失敗しました。',
+        'fallback': q,
         'callback_id': 'db_answer',
         'color': 'good'
       });
@@ -202,10 +204,12 @@ var generateQuiz = function (cb) {
       // show images    
       $('.qno + div').find('.img_margin').each(function () {
         var d = $(this);
+        var url = link.replace(/am2_\d+\.html/i, d.find('img').attr('src'));
         attachments.push({
           'text': no,
+          'fallback': url,
           'color': '#808080',
-          'image_url': link.replace(/am2_\d+\.html/i, d.find('img').attr('src'))
+          'image_url': url,
         });
       });
       
