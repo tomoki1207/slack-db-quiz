@@ -3,6 +3,7 @@ var HerokuKeepalive = require('@ponko2/botkit-heroku-keepalive');
 var cheerio = require('cheerio-httpcli');
 var mongoStorage = require('botkit-storage-mongo')({mongoUri: process.env.MONGODB_URI});
 var cronJob = require('cron').CronJob;
+var request = require('request');
 
 if (!process.env.clientId || !process.env.clientSecret || !process.env.port) {
   console.log('Error: Specify clientId clientSecret and port in environment');
@@ -31,6 +32,25 @@ controller.setupWebserver(process.env.port, function (err, webserver) {
   });
 
   herokuKeepalive = new HerokuKeepalive(controller);
+
+  // image proxy
+  controller.webserver.get('/image', function (req, res) {
+    console.log(req.originalUrl);
+    var imageUrl = req.query.url;
+    if (!imageUrl) {
+      res.set('Content-Type', 'text/plain');
+      res.send('Error');
+      return;
+    }
+    request.head(imageUrl, function (err, resp, _) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      res.set('Content-Type', resp.headers['content-type']);
+      request(imageUrl).pipe(res);
+    });
+  });
 });
 
 // just a simple way to make sure we don't
@@ -141,7 +161,7 @@ controller.on('interactive_message_callback', function (bot, message) {
       'text': original.text,
       'attachments': [{
         'text': text,
-        'fallback': message.actions[0].text + ' を選択 ->' + (collect ? '正解' : '残念'),
+        'fallback': message.actions[0].value + ' を選択 ->' + (collect ? '正解' : '残念'),
         'callback_id': 'db_answer',
         'color': collect ? 'good' : 'danger'
       }],
@@ -170,6 +190,7 @@ var generateQuiz = function (cb) {
           'type': 'button',
           'name': btn.attr('id') ? 'collect' : 'wrong',
           'text': btn.find('button').text(),
+          'value': btn.find('button').text()
         };
 
         var img = btn.prev('div').find('img');         
@@ -183,7 +204,7 @@ var generateQuiz = function (cb) {
           var att = {
             'text': btn.find('button').text(),
             'fallback': url,
-            'image_url': url,
+            'image_url': process.env.HEROKU_URL + 'image?url=' + url,
             'color': '#808080',
             'callback_id': 'db_answer',
             'actions': [ans]
@@ -209,7 +230,7 @@ var generateQuiz = function (cb) {
           'text': no,
           'fallback': url,
           'color': '#808080',
-          'image_url': url,
+          'image_url': process.env.HEROKU_URL + 'image?url=' + url,
         });
       });
       
